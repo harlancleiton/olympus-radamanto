@@ -1,6 +1,5 @@
 package com.olympus.radamanto.domain.aggregates
 
-import com.olympus.radamanto.domain.entities.BaseEntity
 import com.olympus.radamanto.domain.events.UserEvent
 import com.olympus.radamanto.domain.valueobjects.EntityId
 import java.time.Instant
@@ -20,10 +19,7 @@ class User private constructor(
     var email: String,
     var passwordHash: String,
     var isEnabled: Boolean
-) : BaseEntity(id) {
-
-    private val uncommittedEvents = mutableListOf<UserEvent>()
-
+) : AggregateRoot<UserEvent>(id) {
 
     /**
      * Changes the user's email address.
@@ -110,7 +106,7 @@ class User private constructor(
      *
      * @param event The event to apply.
      */
-    private fun applyEvent(event: UserEvent) {
+    override fun applyEvent(event: UserEvent) {
         when (event) {
             is UserEvent.UserCreated -> {
                 this.username = event.username
@@ -137,25 +133,7 @@ class User private constructor(
                 this.isEnabled = true
             }
         }
-        this.version = event.version
-        this.updatedAt = event.occurredAt
-        uncommittedEvents.add(event)
-    }
-
-
-    /**
-     * Returns a list of all uncommitted events.
-     *
-     * @return A list of uncommitted UserEvents.
-     */
-    fun getUncommittedEvents(): List<UserEvent> = uncommittedEvents.toList()
-
-
-    /**
-     * Clears the list of uncommitted events.
-     */
-    fun clearUncommittedEvents() {
-        uncommittedEvents.clear()
+        super.applyEvent(event)
     }
 
     companion object {
@@ -171,7 +149,8 @@ class User private constructor(
                 id = event.aggregateId,
                 username = event.username,
                 email = event.email,
-                passwordHash = "", // This will be set later
+                // TODO This will be set later
+                passwordHash = "",
                 isEnabled = true
             )
             user.applyEvent(event)
