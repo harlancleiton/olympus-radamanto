@@ -35,29 +35,6 @@ object UserEventFactory {
 
 
     /**
-     * Creates a PasswordChangedEvent.
-     *
-     * @param aggregateId The ID of the user aggregate.
-     * @param newPasswordHash The new password hash.
-     * @param version The version of the event.
-     * @return A new instance of UserEvent.PasswordChanged.
-     */
-    fun createPasswordChangedEvent(
-        aggregateId: EntityId,
-        newPasswordHash: String,
-        version: Long
-    ): UserEvent.PasswordChanged {
-        return UserEvent.PasswordChanged(
-            id = EntityId.generate(),
-            aggregateId = aggregateId,
-            newPasswordHash = newPasswordHash,
-            occurredAt = Instant.now(),
-            version = version
-        )
-    }
-
-
-    /**
      * Creates an EmailChangedEvent.
      *
      * @param aggregateId The ID of the user aggregate.

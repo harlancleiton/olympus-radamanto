@@ -32,26 +32,6 @@ sealed class UserEvent : DomainEvent {
 
 
     /**
-     * Represents the event of a user's password being changed.
-     *
-     * @property id The unique identifier of the event.
-     * @property aggregateId The identifier of the user aggregate.
-     * @property newPasswordHash The new password hash.
-     * @property occurredAt The timestamp when the password was changed.
-     * @property version The version of the user aggregate after the password change.
-     */
-    data class PasswordChanged(
-        override val id: EntityId,
-        override val aggregateId: EntityId,
-        val newPasswordHash: String,
-        override val occurredAt: Instant,
-        override val version: Long
-    ) : UserEvent() {
-        override val name: String = "PASSWORD_CHANGED"
-    }
-
-
-    /**
      * Represents the event of a user's email being changed.
      *
      * @property id The unique identifier of the event.

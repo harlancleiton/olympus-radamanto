@@ -49,7 +49,6 @@ object UserFactory {
             events.drop(1).forEach { event ->
                 when (event) {
                     is UserEvent.EmailChanged -> user.changeEmail(event.newEmail)
-                    is UserEvent.PasswordChanged -> user.changePassword(event.newPasswordHash)
                     is UserEvent.UserDisabled -> user.disable("Reconstituted from event")
                     is UserEvent.UserEnabled -> user.enable()
                     is UserEvent.UserCreated -> throw IllegalArgumentException("Duplicate UserCreated event")

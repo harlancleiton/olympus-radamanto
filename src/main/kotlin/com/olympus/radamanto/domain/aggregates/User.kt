@@ -10,14 +10,12 @@ import java.time.Instant
  *
  * @property username The username of the user.
  * @property email The email address of the user.
- * @property passwordHash The hashed password of the user.
  * @property isEnabled Indicates whether the user account is enabled or disabled.
  */
 class User private constructor(
     id: EntityId,
     var username: String,
     var email: String,
-    var passwordHash: String,
     var isEnabled: Boolean
 ) : AggregateRoot<UserEvent>(id) {
 
@@ -33,26 +31,6 @@ class User private constructor(
                 id = EntityId.generate(),
                 aggregateId = this.id,
                 newEmail = newEmail,
-                occurredAt = Instant.now(),
-                version = this.version + 1
-            )
-            applyEvent(event)
-        }
-    }
-
-
-    /**
-     * Changes the user's password.
-     *
-     * @param newPasswordHash The new password hash.
-     * @return A Result indicating success or failure of the operation.
-     */
-    fun changePassword(newPasswordHash: String): Result<Unit> {
-        return runCatching {
-            val event = UserEvent.PasswordChanged(
-                id = EntityId.generate(),
-                aggregateId = this.id,
-                newPasswordHash = newPasswordHash,
                 occurredAt = Instant.now(),
                 version = this.version + 1
             )
@@ -119,11 +97,6 @@ class User private constructor(
             }
 
 
-            is UserEvent.PasswordChanged -> {
-                this.passwordHash = event.newPasswordHash
-            }
-
-
             is UserEvent.UserDisabled -> {
                 this.isEnabled = false
             }
@@ -149,8 +122,6 @@ class User private constructor(
                 id = event.aggregateId,
                 username = event.username,
                 email = event.email,
-                // TODO This will be set later
-                passwordHash = "",
                 isEnabled = true
             )
             user.applyEvent(event)
