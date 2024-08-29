@@ -52,6 +52,26 @@ sealed class UserEvent : DomainEvent {
 
 
     /**
+     * Represents the event of a user's username being changed.
+     *
+     * @property id The unique identifier of the event.
+     * @property aggregateId The identifier of the user aggregate.
+     * @property newUsername The new username.
+     * @property occurredAt The timestamp when the email was changed.
+     * @property version The version of the user aggregate after the email change.
+     */
+    data class UsernameChanged(
+        override val id: EntityId,
+        override val aggregateId: EntityId,
+        val newUsername: String,
+        override val occurredAt: Instant,
+        override val version: Long
+    ) : UserEvent() {
+        override val name: String = "USERNAME_CHANGED"
+    }
+
+
+    /**
      * Represents the event of a user being disabled in the system.
      *
      * @property id The unique identifier of the event.

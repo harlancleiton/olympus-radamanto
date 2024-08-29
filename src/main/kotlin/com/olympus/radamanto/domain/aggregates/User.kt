@@ -1,7 +1,8 @@
 package com.olympus.radamanto.domain.aggregates
 
+import com.olympus.radamanto.domain.events.EventPublisher
 import com.olympus.radamanto.domain.events.UserEvent
-import com.olympus.radamanto.domain.valueobjects.EntityId
+import com.olympus.radamanto.domain.valueobjects.*
 import java.time.Instant
 
 /**
@@ -14,10 +15,11 @@ import java.time.Instant
  */
 class User private constructor(
     id: EntityId,
-    var username: String,
-    var email: String,
-    var isEnabled: Boolean
-) : AggregateRoot<UserEvent>(id) {
+    var username: Username,
+    var email: Email,
+    var isEnabled: Boolean,
+    publisher: EventPublisher
+) : AggregateRoot<UserEvent>(id, publisher) {
 
     /**
      * Changes the user's email address.
@@ -25,12 +27,34 @@ class User private constructor(
      * @param newEmail The new email address.
      * @return A Result indicating success or failure of the operation.
      */
-    fun changeEmail(newEmail: String): Result<Unit> {
+    fun changeEmail(newEmail: Email): Result<Unit> {
         return runCatching {
+            if (newEmail == email) return@runCatching
             val event = UserEvent.EmailChanged(
                 id = EntityId.generate(),
                 aggregateId = this.id,
-                newEmail = newEmail,
+                newEmail = newEmail.value,
+                occurredAt = Instant.now(),
+                version = this.version + 1
+            )
+            applyEvent(event)
+        }
+    }
+
+
+    /**
+     * Changes the user's email address.
+     *
+     * @param newUsername The new username.
+     * @return A Result indicating success or failure of the operation.
+     */
+    fun changeUsername(newUsername: Username): Result<Unit> {
+        return runCatching {
+            if (newUsername == username) return@runCatching
+            val event = UserEvent.UsernameChanged(
+                id = EntityId.generate(),
+                aggregateId = this.id,
+                newUsername = newUsername.value,
                 occurredAt = Instant.now(),
                 version = this.version + 1
             )
@@ -87,13 +111,18 @@ class User private constructor(
     override fun applyEvent(event: UserEvent) {
         when (event) {
             is UserEvent.UserCreated -> {
-                this.username = event.username
-                this.email = event.email
+                this.username = Username.create(event.username).getOrThrow()
+                this.email = Email.create(event.email).getOrThrow()
             }
 
 
             is UserEvent.EmailChanged -> {
-                this.email = event.newEmail
+                this.email = Email.create(event.newEmail).getOrThrow()
+            }
+
+
+            is UserEvent.UsernameChanged -> {
+                this.username = Username.create(event.newUsername).getOrThrow()
             }
 
 
@@ -117,12 +146,13 @@ class User private constructor(
          * @param event The UserCreated event.
          * @return A new User instance.
          */
-        internal fun createFromEvent(event: UserEvent.UserCreated): User {
+        internal fun createFromEvent(event: UserEvent.UserCreated, publisher: EventPublisher): User {
             val user = User(
                 id = event.aggregateId,
-                username = event.username,
-                email = event.email,
-                isEnabled = true
+                username = Username.create(event.username).getOrThrow(),
+                email = Email.create(event.email).getOrThrow(),
+                isEnabled = true,
+                publisher = publisher
             )
             user.applyEvent(event)
             return user

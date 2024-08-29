@@ -58,6 +58,29 @@ object UserEventFactory {
 
 
     /**
+     * Creates an UsernameChangedEvent.
+     *
+     * @param aggregateId The ID of the user aggregate.
+     * @param newUsername The new username of the user.
+     * @param version The version of the event.
+     * @return A new instance of UserEvent.UsernameChanged.
+     */
+    fun createUsernameChangedEvent(
+        aggregateId: EntityId,
+        newUsername: String,
+        version: Long
+    ): UserEvent.UsernameChanged {
+        return UserEvent.UsernameChanged(
+            id = EntityId.generate(),
+            aggregateId = aggregateId,
+            newUsername = newUsername,
+            occurredAt = Instant.now(),
+            version = version
+        )
+    }
+
+
+    /**
      * Creates a UserDisabledEvent.
      *
      * @param aggregateId The ID of the user aggregate.
