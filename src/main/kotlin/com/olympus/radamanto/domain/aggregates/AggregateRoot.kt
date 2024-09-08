@@ -47,6 +47,7 @@ abstract class AggregateRoot<T : DomainEvent>(
      * @return A Result indicating success or failure of the commit operation.
      */
     fun commit(): Result<Unit> {
+        // TODO change return to void
         return runCatching {
             publisher.publishAll(uncommittedEvents)
             clearUncommittedEvents()
