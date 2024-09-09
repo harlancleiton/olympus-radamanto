@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
  * @property handlers A map of command types to their respective handlers.
  */
 @Suppress("UNCHECKED_CAST")
-class CommandBusImpl(
+class SimpleCommandBus(
     private val handlers: Map<KClass<out Command>, CommandHandler<*, *>>
 ) : CommandBus {
 

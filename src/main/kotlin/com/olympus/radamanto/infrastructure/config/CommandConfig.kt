@@ -4,7 +4,7 @@ import com.olympus.radamanto.application.commands.*
 import com.olympus.radamanto.application.ports.input.CommandBus
 import com.olympus.radamanto.application.ports.output.UserCommandRepository
 import com.olympus.radamanto.domain.events.EventPublisher
-import com.olympus.radamanto.infrastructure.adapters.input.CommandBusImpl
+import com.olympus.radamanto.infrastructure.adapters.input.SimpleCommandBus
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.lang.reflect.ParameterizedType
@@ -24,8 +24,8 @@ class CommandConfig {
 
             commandType as KClass<out Command>
         }
-        
-        return CommandBusImpl(handlerMap)
+
+        return SimpleCommandBus(handlerMap)
     }
 
 
