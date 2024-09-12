@@ -16,36 +16,40 @@ class MongoEventStore(
     private val objectMapper: ObjectMapper
 ) : EventStore {
 
-    override fun saveEvents(aggregateId: EntityId, events: List<DomainEvent>, expectedVersion: Long) {
-        val lastEvent = mongoTemplate.findOne(
-            Query(Criteria.where("aggregateId").isEqualTo(aggregateId.value))
-                .with(Sort.by(Sort.Direction.DESC, "version"))
-                .limit(1),
-            EventDocument::class.java
-        )
-
-        if (lastEvent != null && lastEvent.version != expectedVersion) {
-            throw ConcurrencyAggregateException(aggregateId)
-        }
-
-        events.forEachIndexed { index, event ->
-            val eventDocument = EventDocument(
-                aggregateId = aggregateId.value.toString(),
-                eventName = event.name,
-                eventType = event.javaClass.simpleName,
-                eventData = objectMapper.writeValueAsString(event),
-                version = expectedVersion + index + 1,
-                timestamp = event.occurredAt
+    override fun saveEvents(aggregateId: EntityId, events: List<DomainEvent>, expectedVersion: Long): Result<Unit> {
+        return runCatching {
+            val lastEvent = mongoTemplate.findOne(
+                Query(Criteria.where("aggregateId").isEqualTo(aggregateId.value))
+                    .with(Sort.by(Sort.Direction.DESC, "version"))
+                    .limit(1),
+                EventDocument::class.java
             )
-            mongoTemplate.save(eventDocument)
+
+            if (lastEvent != null && lastEvent.version != expectedVersion) {
+                throw ConcurrencyAggregateException(aggregateId)
+            }
+
+            events.forEachIndexed { index, event ->
+                val eventDocument = EventDocument(
+                    aggregateId = aggregateId.value.toString(),
+                    eventName = event.name,
+                    eventType = event.javaClass.simpleName,
+                    eventData = objectMapper.writeValueAsString(event),
+                    version = expectedVersion + index + 1,
+                    timestamp = event.occurredAt
+                )
+                mongoTemplate.save(eventDocument)
+            }
         }
     }
 
-    override fun getEvents(aggregateId: EntityId): List<DomainEvent> {
-        return mongoTemplate.find(
-            Query(Criteria.where("aggregateId").isEqualTo(aggregateId.value))
-                .with(Sort.by(Sort.Direction.ASC, "version")),
-            EventDocument::class.java
-        ).map { it.toDomainEvent(objectMapper) }
+    override fun getEvents(aggregateId: EntityId): Result<List<DomainEvent>> {
+        return runCatching {
+            mongoTemplate.find(
+                Query(Criteria.where("aggregateId").isEqualTo(aggregateId.value))
+                    .with(Sort.by(Sort.Direction.ASC, "version")),
+                EventDocument::class.java
+            ).map { it.toDomainEvent(objectMapper) }
+        }
     }
 }
