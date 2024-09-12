@@ -21,7 +21,7 @@ class MongoEventStore(
             Query(Criteria.where("aggregateId").isEqualTo(aggregateId.value))
                 .with(Sort.by(Sort.Direction.DESC, "version"))
                 .limit(1),
-            MongoDomainEventDocument::class.java
+            EventDocument::class.java
         )
 
         if (lastEvent != null && lastEvent.version != expectedVersion) {
@@ -29,7 +29,7 @@ class MongoEventStore(
         }
 
         events.forEachIndexed { index, event ->
-            val eventDocument = MongoDomainEventDocument(
+            val eventDocument = EventDocument(
                 aggregateId = aggregateId.value.toString(),
                 eventName = event.name,
                 eventType = event.javaClass.simpleName,
@@ -45,7 +45,7 @@ class MongoEventStore(
         return mongoTemplate.find(
             Query(Criteria.where("aggregateId").isEqualTo(aggregateId.value))
                 .with(Sort.by(Sort.Direction.ASC, "version")),
-            MongoDomainEventDocument::class.java
+            EventDocument::class.java
         ).map { it.toDomainEvent(objectMapper) }
     }
 }
