@@ -5,16 +5,15 @@ package com.olympus.radamanto.domain.exceptions
  * This sealed class extends BaseException and provides specific exception types for EntityId issues.
  *
  * @property message A descriptive message for the exception.
- * @property cause The underlying cause of the exception, if any.
  */
-sealed class EntityIdException(message: String, cause: Throwable? = null) : BaseException(message, cause) {
+sealed class EntityIdException(message: String) : BaseException(message) {
 
     /**
      * Represents an exception for an invalid UUID format.
      *
      * @property value The string value that failed to parse as a valid UUID.
      */
-    data class InvalidUUID(val value: String) : EntityIdException("$value isn't a valid uuid", null)
+    data class InvalidUUID(val value: String) : EntityIdException("$value isn't a valid uuid")
 
 
     /**

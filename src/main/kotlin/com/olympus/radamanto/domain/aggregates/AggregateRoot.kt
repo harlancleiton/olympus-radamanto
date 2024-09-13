@@ -70,7 +70,7 @@ abstract class AggregateRoot<T : DomainEvent>(
      *
      * This method should be called after the events have been successfully persisted or published.
      */
-    fun clearUncommittedEvents() {
+    private fun clearUncommittedEvents() {
         uncommittedEvents.clear()
     }
 }
