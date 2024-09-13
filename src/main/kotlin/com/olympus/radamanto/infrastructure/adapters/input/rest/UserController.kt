@@ -2,7 +2,7 @@ package com.olympus.radamanto.infrastructure.adapters.input.rest
 
 import com.olympus.radamanto.application.commands.CreateUserCommand
 import com.olympus.radamanto.application.ports.input.CommandBus
-import com.olympus.radamanto.domain.valueobjects.EntityId
+import com.olympus.radamanto.domain.valueobjects.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
@@ -24,7 +24,11 @@ class UserController(private val commandBus: CommandBus) {
      */
     @PostMapping
     fun createUser(@RequestBody request: CreateUserRequest): ResponseEntity<Any> {
-        val command = CreateUserCommand(request.username, request.email, request.password)
+        val command = CreateUserCommand(
+            Username.create(request.username).getOrThrow(),
+            Email.create(request.email).getOrThrow(),
+            Password.create(request.password).getOrThrow()
+        )
         val result = commandBus.dispatch(command)
 
         return when (result.isSuccess) {

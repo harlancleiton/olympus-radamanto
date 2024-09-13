@@ -2,6 +2,7 @@ package com.olympus.radamanto.infrastructure.config
 
 import com.olympus.radamanto.application.commands.*
 import com.olympus.radamanto.application.ports.input.CommandBus
+import com.olympus.radamanto.application.ports.input.QueryBus
 import com.olympus.radamanto.application.ports.output.UserCommandRepository
 import com.olympus.radamanto.domain.events.EventPublisher
 import com.olympus.radamanto.infrastructure.adapters.input.SimpleCommandBus
@@ -31,9 +32,10 @@ class CommandConfig {
 
     @Bean
     fun createUserCommandHandler(
+        queryBus: QueryBus,
         userCommandRepository: UserCommandRepository,
         eventPublisher: EventPublisher
     ): CommandHandler<*, *> {
-        return CreateUserCommandHandler(userCommandRepository, eventPublisher)
+        return CreateUserCommandHandler(queryBus, userCommandRepository, eventPublisher)
     }
 }

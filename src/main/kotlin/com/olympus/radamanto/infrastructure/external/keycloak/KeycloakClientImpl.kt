@@ -1,6 +1,8 @@
 package com.olympus.radamanto.infrastructure.external.keycloak
 
 import com.olympus.radamanto.domain.aggregates.User
+import com.olympus.radamanto.domain.exceptions.PasswordException
+import com.olympus.radamanto.domain.valueobjects.Email
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
@@ -21,8 +23,8 @@ class KeycloakClientImpl(
 
     override fun createUser(user: User): Result<Unit> {
         logger.debug("Creating the user ${user.username} – ${user.email}")
+        if (user.password == null) return Result.failure(PasswordException.InvalidFormat)
         return runCatching {
-            requireNotNull(user.password)
             val credentials = listOf(preparePasswordRepresentation(user.password!!.value))
             val ur = UserRepresentation().apply {
                 this.id = user.id.value.toString()
@@ -37,6 +39,13 @@ class KeycloakClientImpl(
                 // TODO handle error appropriately
                 throw Exception("Failed to create user in Keycloak. Status: ${response.status}")
             }
+        }
+    }
+
+    override fun existsByEmail(email: Email): Result<Boolean> {
+        return runCatching {
+            val users = keycloak.realm(realm).users().searchByEmail(email.value, true)
+            users.isNotEmpty()
         }
     }
 
