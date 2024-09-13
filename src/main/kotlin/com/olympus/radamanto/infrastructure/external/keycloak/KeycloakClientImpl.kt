@@ -33,8 +33,6 @@ class KeycloakClientImpl(
                 isEnabled = true
             }
             val response = keycloak.realm(realm).users().create(ur)
-            logger.info("${response.status}")
-            logger.info(response.entity.toString())
             if (response.status != Response.Status.CREATED.statusCode) {
                 // TODO handle error appropriately
                 throw Exception("Failed to create user in Keycloak. Status: ${response.status}")
