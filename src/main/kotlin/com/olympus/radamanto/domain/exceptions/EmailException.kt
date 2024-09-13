@@ -1,4 +1,3 @@
-// EmailError.kt
 package com.olympus.radamanto.domain.exceptions
 
 /**
