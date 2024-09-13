@@ -9,7 +9,9 @@ sealed class UsernameException(message: String) : BaseException(message) {
     /**
      * Error for when the username is blank.
      */
-    data object BlankUsername : UsernameException("Username cannot be blank")
+    data object BlankUsername : UsernameException("Username cannot be blank") {
+        private fun readResolve(): Any = BlankUsername
+    }
 
 
     /**
@@ -28,7 +30,9 @@ sealed class UsernameException(message: String) : BaseException(message) {
      * Error for when the username contains invalid characters.
      */
     data object InvalidUsernameFormat :
-        UsernameException("Username can only contain letters, numbers, dots, underscores, and hyphens")
+        UsernameException("Username can only contain letters, numbers, dots, underscores, and hyphens") {
+        private fun readResolve(): Any = InvalidUsernameFormat
+    }
 
 
     override fun isClientError(): Boolean = true
