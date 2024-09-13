@@ -17,13 +17,15 @@ object UserFactory {
      * @param email The email address for the new user.
      * @return A Result containing the new User instance if successful, or an error if creation fails.
      */
-    fun create(username: String, email: String, publisher: EventPublisher): Result<User> {
+    fun create(username: String, email: String, password: String, publisher: EventPublisher): Result<User> {
         val usernameResult = Username.create(username)
         val emailResult = Email.create(email)
+        val passwordResult = Password.create(password)
 
         return when {
             usernameResult.isFailure -> Result.failure(usernameResult.exceptionOrNull()!!)
             emailResult.isFailure -> Result.failure(emailResult.exceptionOrNull()!!)
+            passwordResult.isFailure -> Result.failure(passwordResult.exceptionOrNull()!!)
 
 
             else -> {
@@ -32,6 +34,7 @@ object UserFactory {
                     aggregateId = EntityId.generate(),
                     username = usernameResult.getOrThrow().value,
                     email = emailResult.getOrThrow().value,
+                    password = passwordResult.getOrThrow().value,
                     occurredAt = Instant.now(),
                     version = 1
                 )

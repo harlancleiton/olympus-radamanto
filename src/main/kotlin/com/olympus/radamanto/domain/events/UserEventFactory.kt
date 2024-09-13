@@ -21,13 +21,15 @@ object UserEventFactory {
     fun createUserCreatedEvent(
         aggregateId: EntityId,
         username: String,
-        email: String
+        email: String,
+        password: String
     ): UserEvent.UserCreated {
         return UserEvent.UserCreated(
             id = EntityId.generate(),
             aggregateId = aggregateId,
             username = username,
             email = email,
+            password = password,
             occurredAt = Instant.now(),
             version = 1
         )

@@ -16,6 +16,7 @@ sealed class UserEvent : DomainEvent {
      * @property aggregateId The identifier of the user aggregate.
      * @property username The username of the newly created user.
      * @property email The email address of the newly created user.
+     * @property password The password of the newly created user.
      * @property occurredAt The timestamp when the user was created.
      * @property version The version of the user aggregate after creation (typically 1).
      */
@@ -24,6 +25,7 @@ sealed class UserEvent : DomainEvent {
         override val aggregateId: EntityId,
         val username: String,
         val email: String,
+        val password: String,
         override val occurredAt: Instant,
         override val version: Long
     ) : UserEvent() {

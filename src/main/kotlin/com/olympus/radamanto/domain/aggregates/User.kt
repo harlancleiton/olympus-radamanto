@@ -17,6 +17,7 @@ class User private constructor(
     id: EntityId,
     var username: Username,
     var email: Email,
+    var password: Password?,
     var isEnabled: Boolean,
     publisher: EventPublisher
 ) : AggregateRoot<UserEvent>(id, publisher) {
@@ -113,6 +114,7 @@ class User private constructor(
             is UserEvent.UserCreated -> {
                 this.username = Username.create(event.username).getOrThrow()
                 this.email = Email.create(event.email).getOrThrow()
+                this.password = Password.create(event.password).getOrThrow()
             }
 
 
@@ -151,6 +153,7 @@ class User private constructor(
                 id = event.aggregateId,
                 username = Username.create(event.username).getOrThrow(),
                 email = Email.create(event.email).getOrThrow(),
+                password = Password.create(event.password).getOrThrow(),
                 isEnabled = true,
                 publisher = publisher
             )

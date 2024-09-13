@@ -22,7 +22,7 @@ class CreateUserCommandHandler(
      * @return A Result containing the EntityId of the newly created user if successful, or an error if failed.
      */
     override fun handle(command: CreateUserCommand): Result<EntityId> {
-        return UserFactory.create(command.username, command.email, eventPublisher)
+        return UserFactory.create(command.username, command.email, command.password, eventPublisher)
             .flatMap { user ->
                 userCommandRepository.save(user)
             }

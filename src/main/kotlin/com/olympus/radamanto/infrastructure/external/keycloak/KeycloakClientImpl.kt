@@ -22,8 +22,8 @@ class KeycloakClientImpl(
     override fun createUser(user: User): Result<Unit> {
         logger.debug("Creating the user ${user.username} – ${user.email}")
         return runCatching {
-            // TODO add Password value object
-            val credentials = listOf(preparePasswordRepresentation("loremipsum"))
+            requireNotNull(user.password)
+            val credentials = listOf(preparePasswordRepresentation(user.password!!.value))
             val ur = UserRepresentation().apply {
                 this.id = user.id.value.toString()
                 this.username = user.username.value

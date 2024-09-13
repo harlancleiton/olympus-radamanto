@@ -24,7 +24,7 @@ class UserController(private val commandBus: CommandBus) {
      */
     @PostMapping
     fun createUser(@RequestBody request: CreateUserRequest): ResponseEntity<Any> {
-        val command = CreateUserCommand(request.username, request.email, "loremipsum")
+        val command = CreateUserCommand(request.username, request.email, request.password)
         val result = commandBus.dispatch(command)
 
         return when (result.isSuccess) {
@@ -48,10 +48,12 @@ class UserController(private val commandBus: CommandBus) {
  *
  * @property username The username of the new user.
  * @property email The email address of the new user.
+ * @property password The password of the new user.
  */
 data class CreateUserRequest(
     val username: String,
-    val email: String
+    val email: String,
+    val password: String
 )
 
 
