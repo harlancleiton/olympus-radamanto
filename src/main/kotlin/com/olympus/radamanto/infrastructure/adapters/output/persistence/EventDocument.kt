@@ -6,6 +6,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.*
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.Field
 import java.time.Instant
 
 @Document(collection = "events")
@@ -18,12 +19,19 @@ data class EventDocument(
     @Indexed val aggregateId: String,
     @Indexed val eventName: String,
     val eventType: String,
-    val eventData: String,
+    @Field("eventData")
+    val eventData: Map<String, Any>,
     @Indexed val version: Long,
     @Indexed val timestamp: Instant
 ) {
+    /**
+     * Converts the stored eventData back to a DomainEvent.
+     *
+     * @param objectMapper The ObjectMapper to use for conversion.
+     * @return The DomainEvent instance.
+     */
     fun toDomainEvent(objectMapper: ObjectMapper): DomainEvent {
         val eventClass = Class.forName(eventType).kotlin
-        return objectMapper.readValue(eventData, eventClass.java) as DomainEvent
+        return objectMapper.convertValue(eventData, eventClass.java) as DomainEvent
     }
 }

@@ -30,11 +30,12 @@ class MongoEventStore(
             }
 
             events.forEachIndexed { index, event ->
+                val eventData = objectMapper.convertValue(event, Map::class.java) as Map<String, Any>
                 val eventDocument = EventDocument(
                     aggregateId = aggregateId.value.toString(),
                     eventName = event.name,
                     eventType = event.javaClass.simpleName,
-                    eventData = objectMapper.writeValueAsString(event),
+                    eventData = eventData,
                     version = expectedVersion + index + 1,
                     timestamp = event.occurredAt
                 )

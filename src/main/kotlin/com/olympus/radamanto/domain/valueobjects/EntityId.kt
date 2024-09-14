@@ -1,5 +1,7 @@
 package com.olympus.radamanto.domain.valueobjects
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 import com.olympus.radamanto.domain.exceptions.EntityIdException
 import java.util.*
 
@@ -9,7 +11,7 @@ import java.util.*
  *
  * @property value The underlying UUID that this EntityId represents.
  */
-class EntityId private constructor(val value: UUID) {
+class EntityId @JsonCreator private constructor(val value: UUID) {
     companion object {
         /**
          * Generates a new EntityId with a random UUID.
@@ -73,5 +75,6 @@ class EntityId private constructor(val value: UUID) {
      *
      * @return A string representation of this EntityId.
      */
+    @JsonValue
     override fun toString(): String = value.toString()
 }
