@@ -5,10 +5,10 @@ import com.olympus.radamanto.application.ports.output.UserQueryRepository
 class CheckEmailExistenceQueryHandler(
     private val userQueryRepository: UserQueryRepository
 ) :
-    QueryHandler<CheckEmailExistenceQuery, Result<Boolean>> {
+    QueryHandler<CheckEmailExistenceQuery, Boolean> {
 
 
-    override fun handle(query: CheckEmailExistenceQuery): Result<Boolean> {
-        return userQueryRepository.existsByEmail(query.email)
+    override fun handle(query: CheckEmailExistenceQuery): Boolean {
+        return userQueryRepository.existsByEmail(query.email).getOrThrow()
     }
 }

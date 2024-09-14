@@ -3,6 +3,7 @@ package com.olympus.radamanto.application.commands
 import com.olympus.radamanto.application.ports.input.QueryBus
 import com.olympus.radamanto.application.ports.output.UserCommandRepository
 import com.olympus.radamanto.application.queries.CheckEmailExistenceQuery
+import com.olympus.radamanto.application.queries.CheckUsernameExistenceQuery
 import com.olympus.radamanto.domain.events.EventPublisher
 import com.olympus.radamanto.domain.factories.UserFactory
 import com.olympus.radamanto.domain.valueobjects.EntityId
@@ -26,23 +27,22 @@ class CreateUserCommandHandler(
      */
     override fun handle(command: CreateUserCommand): Result<EntityId> {
         val emailExists = queryBus.dispatch(CheckEmailExistenceQuery(command.email))
-        return emailExists.flatMap {
-            runCatching {
-                if (it.getOrThrow()) {
-                    throw IllegalArgumentException("Email already in use")
-                }
+        if (emailExists.isSuccess && emailExists.getOrThrow()) {
+            return Result.failure(IllegalArgumentException("Email already in use"))
+        }
 
-                UserFactory.create(
-                    command.username,
-                    command.email,
-                    command.password,
-                    eventPublisher
-                )
-            }.flatMap {
-                userCommandRepository.save(it.getOrThrow())
-            }.flatMap { savedUser ->
+        val usernameExists = queryBus.dispatch(CheckUsernameExistenceQuery(command.username))
+        if (usernameExists.isSuccess && usernameExists.getOrThrow()) {
+            return Result.failure(IllegalArgumentException("Username already in use"))
+        }
+
+        return UserFactory.create(command.username, command.email, command.password, eventPublisher)
+            .flatMap { user ->
+                userCommandRepository.save(user)
+            }
+            .flatMap { savedUser ->
                 savedUser.commit().map { savedUser.id }
             }
-        }
+
     }
 }

@@ -13,9 +13,11 @@ class QueryConfig {
     @Bean
     fun queryBus(
         checkEmailExistenceQueryHandler: CheckEmailExistenceQueryHandler,
+        checkUsernameExistenceQueryHandler: CheckUsernameExistenceQueryHandler
     ): QueryBus {
         val handlers: Map<Class<out Query<*>>, QueryHandler<*, *>> = mapOf(
             CheckEmailExistenceQuery::class.java to checkEmailExistenceQueryHandler,
+            CheckUsernameExistenceQuery::class.java to checkUsernameExistenceQueryHandler
         )
         return SimpleQueryBus(handlers)
     }
@@ -24,5 +26,11 @@ class QueryConfig {
     @Bean
     fun checkEmailExistenceQueryHandler(userQueryRepository: UserQueryRepository): CheckEmailExistenceQueryHandler {
         return CheckEmailExistenceQueryHandler(userQueryRepository)
+    }
+
+
+    @Bean
+    fun checkUsernameExistenceQueryHandler(userQueryRepository: UserQueryRepository): CheckUsernameExistenceQueryHandler {
+        return CheckUsernameExistenceQueryHandler(userQueryRepository)
     }
 }

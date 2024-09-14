@@ -3,6 +3,7 @@ package com.olympus.radamanto.infrastructure.external.keycloak
 import com.olympus.radamanto.domain.aggregates.User
 import com.olympus.radamanto.domain.exceptions.PasswordException
 import com.olympus.radamanto.domain.valueobjects.Email
+import com.olympus.radamanto.domain.valueobjects.Username
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
@@ -45,6 +46,13 @@ class KeycloakClientImpl(
     override fun existsByEmail(email: Email): Result<Boolean> {
         return runCatching {
             val users = keycloak.realm(realm).users().searchByEmail(email.value, true)
+            users.isNotEmpty()
+        }
+    }
+
+    override fun existsByUsername(username: Username): Result<Boolean> {
+        return runCatching {
+            val users = keycloak.realm(realm).users().searchByUsername(username.value, true)
             users.isNotEmpty()
         }
     }

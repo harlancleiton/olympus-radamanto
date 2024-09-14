@@ -2,6 +2,7 @@ package com.olympus.radamanto.infrastructure.external.keycloak
 
 import com.olympus.radamanto.domain.aggregates.User
 import com.olympus.radamanto.domain.valueobjects.Email
+import com.olympus.radamanto.domain.valueobjects.Username
 
 /**
  * Interface for interacting with the Keycloak authentication and authorization server.
@@ -27,4 +28,6 @@ interface KeycloakClient {
      * @return True if the email is already in use, false otherwise.
      */
     fun existsByEmail(email: Email): Result<Boolean>
+
+    fun existsByUsername(username: Username): Result<Boolean>
 }
